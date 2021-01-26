@@ -99,7 +99,7 @@ export async function readfile(file_name, return_string=true) {
 
 export async function createfile(file_name) {
     file_name = strip_flash(file_name);
-    return await transceive(`from upysh import newfile; newfile('${file_name}')`);
+    return await transceive(`f=open('${file_name}', 'w'); f.close()`);
 }
 
 export async function deldir(dir_name) {
