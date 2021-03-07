@@ -152,7 +152,9 @@
         },
         beforeMount() {
             component = this;
-            on_connect().then(async () => {
+            (async () => {
+                await on_connect();
+                component.repo_name = (await transceive('import consts;print(consts.INFO_HARDWARE_WOEZEL_NAME)')).trim();
                 let contents = await readfile('/flash/config/system-launcher_items.json', );
                 let launcher_items;
                 try {
@@ -162,20 +164,20 @@
                 }
                 component.launcher_items = launcher_items;
                 await component.update_local_apps();
-            });
-
-            fetch('https://hatchery.badge.team/basket/pixel/list/json',{mode:'cors'})
-                .then(response => {response.json().then((apps) => {
-                    component.store_apps = apps;
-                    for(let app of apps) {
-                        if(component.categories.indexOf(app.category) === -1) {
-                            component.categories.push(app.category);
+            
+                fetch('https://hatchery.badge.team/basket/'+component.repo_name+'/list/json',{mode:'cors'})
+                    .then(response => {response.json().then((apps) => {
+                        component.store_apps = apps;
+                        for(let app of apps) {
+                            if(component.categories.indexOf(app.category) === -1) {
+                                component.categories.push(app.category);
+                            }
+                            if(component.states.indexOf(app.status) === -1) {
+                                component.states.push(app.status);
+                            }
                         }
-                        if(component.states.indexOf(app.status) === -1) {
-                            component.states.push(app.status);
-                        }
-                    }
-                })});
+                    })});
+                })();
         },
         methods: {
             update_local_apps: async () => {
