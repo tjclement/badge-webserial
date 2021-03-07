@@ -63,7 +63,7 @@
                 component.badge_firmware_version = parseInt(version);
                 component.checking_badge = false;
 
-                fetch('http://ota.badge.team/version/'+repo_name+'.txt',{mode:'cors'})
+                fetch('https://ota.badge.team/version/'+repo_name+'.txt',{mode:'cors'})
                     .then(response => {response.json().then((version) => {
                         component.server_firmware_version = version.build;
                         component.server_firmware_name = version.name;
