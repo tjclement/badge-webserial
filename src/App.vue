@@ -9,7 +9,7 @@
     </mdb-modal>
     <!-- Sidebar -->
     <div class="sidebar-fixed position-fixed">
-      <a class="logo-wrapper"><img alt="" class="img-fluid" src="./assets/hackzone_logo.png"/></a>
+      <a class="logo-wrapper"><img alt="" class="img-fluid" src="./assets/cs_logo_round.png"/></a>
       <mdb-list-group class="list-group-flush">
         <router-link to="/apps" @click.native="activeItem = 1">
           <mdb-list-group-item
