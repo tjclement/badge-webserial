@@ -4,8 +4,8 @@
       <mdb-modal-header>
         <mdb-modal-title>Let's get started</mdb-modal-title>
       </mdb-modal-header>
-      <mdb-modal-body v-if="has_serial">Click anywhere to connect to your CampZone2020 Event Badge via USB</mdb-modal-body>
-      <mdb-modal-body v-else>It appears your browser does not support WebSerial. Make sure to use Chrome (or derivatives like Brave), and <a href="https://codelabs.developers.google.com/codelabs/web-serial/#2">enable "experimental web features" in about:flags</a>.</mdb-modal-body>
+      <mdb-modal-body v-if="has_serial">Click anywhere to connect to your badge via USB</mdb-modal-body>
+      <mdb-modal-body v-else>It appears your browser does not support WebSerial. Make sure to use Chrome (at least v89).</mdb-modal-body>
     </mdb-modal>
     <!-- Sidebar -->
     <div class="sidebar-fixed position-fixed">
