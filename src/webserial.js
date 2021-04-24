@@ -2,7 +2,7 @@
  * Created by Tom on 5/27/2020.
  */
 export let device = {opened: false};
-let stdout_callback, port, reader, writer;
+export let port, stdout_callback, reader, writer;
 
 let MAX_RETRIES = 3;
 

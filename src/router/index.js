@@ -38,14 +38,20 @@ export default new Router({
       component: Settings
     },
     {
+      path: '/recover',
+      name: 'Recover',
+      props: { page: 5 },
+      component: Settings
+    },
+    {
       path: '/404',
       name: 'BadGateway',
-      props: { page: 5 },
+      props: { page: 6 },
       component: BadGateway
     },
     {
       path: '*',
-      props: { page: 5 },
+      props: { page: 6 },
       redirect: '/404'
     }
   ]
