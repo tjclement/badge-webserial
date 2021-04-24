@@ -7,7 +7,7 @@
                     <mdb-card-body>
                         This is an experimental page that you can use to recover the firmware on your Pixel.
 
-                        {{status ? status : ""}}
+                        {{status}}
                         <mdb-btn color="primary" size="sm" v-on:click="recover">Recover your Pixel Badge</mdb-btn>
                     </mdb-card-body>
                 </mdb-card>
@@ -42,6 +42,7 @@
         reader
     } from '../badgecomm';
     import {badges} from '../badge_configs';
+    import {EspLoader, inputBuffer} from '../esptool';
 
     let component = undefined;
 
@@ -76,7 +77,7 @@
             render: async (text) => {
                 component.status = text;
             },
-            getData(filename) {
+            getData: async (filename) => {
                 var request = new Request('assets/firmware/pixel'+filename);
                 var response = await fetch(request);
                 return response.arrayBuffer();
@@ -85,52 +86,61 @@
                 return "0x" + value.toString(16).toUpperCase().padStart(size, "0");
             },
             showProgress(operation, progress = 0) {
-                render("Writing "+operation.name+" to " + toHex(operation.address) + "... ("+progress+"%)");
+                component.render("Writing "+operation.name+" to " + component.toHex(operation.address) + "... ("+progress+"%)");
+            },
+            readLoop: async () => {
+                while (reader) {
+                    const { value, done } = await reader.read();
+                    if (done) {
+                        reader.releaseLock();
+                        break;
+                    }
+                    addInput(value);
+                }
             },
             recover: async (event) => {
                 let badge = badges['pixel'];
-                let espTool = new EspLoader(render, (text) => render('Error: ' + text), port, badge.flashsize, (data) => writer.write(data));
+                component.readLoop().catch((error) => {
+                    component.render(this.templates.disconnected, error);
+                });
+                let espTool = new EspLoader(component.render, (text) => component.render('Error: ' + text), port, badge.flashsize, (data) => writer.write(data));
                 let stubLoader;
-                render("Connecting to the badge...");
+                component.render("Connecting to the badge...");
                 try {
                     if (await espTool.sync()) {
                         if (badge.baudrate != ESP_ROM_BAUD) {
-                            render("Changing baudrate...");
+                            component.render("Changing baudrate...");
                             await espTool.setBaudrate(badge.baudrate);
                         }
-                        render("Connected to " + await espTool.chipName() + " (" + espTool.macAddr().map(value => value.toString(16).toUpperCase().padStart(2, "0")).join(":") + "), loading stub...");
+                        component.render("Connected to " + await espTool.chipName() + " (" + espTool.macAddr().map(value => value.toString(16).toUpperCase().padStart(2, "0")).join(":") + "), loading stub...");
                         stubLoader = await espTool.runStub();
                     } else {
-                        render("Failed to connect.");
+                        component.render("Failed to connect.");
                     }
                 } catch(error) {
-                    render(error);
+                    component.render(error);
+                    return;
                 }
 
                 try {
                     let operations = badge.flash;
                     for (let index = 0; index < operations.length; index++) {
                         let operation = operations[index];
-                        render("Downloading "+operation.name+"...");
-                        let data = await getData(operation.filename);
-                        showProgress(operation);
-                        await stubLoader.flashData(data, operation.address, showProgress.bind(this, operation));
+                        component.render("Downloading "+operation.name+"...");
+                        let data = await component.getData(operation.filename);
+                        component.showProgress(operation);
+                        await stubLoader.flashData(data, operation.address, component.showProgress.bind(this, operation));
                     }
-                    render("Done.");
+                    component.render("Done.");
                 } catch(error) {
                     console.error(error);
-                    render(error);
+                    component.render(error);
                 }
             }
         },
         data() {
             return {
-                badge_firmware_version: 0,
-                badge_firmware_name: '',
-                server_firmware_version: 0,
-                server_firmware_name: '',
-                checking_badge: true,
-                checking_server: true
+                status: ''
             }
         },
         computed: {

@@ -1,6 +1,10 @@
 "use strict";
 
-var inputBuffer = [];
+export var inputBuffer = [];
+
+export function addInput(value) {
+  inputBuffer = inputBuffer.concat(Array.from(value));
+}
 
 const baudRates = [921600, 115200, 230400, 460800];
 const flashSizes = {
@@ -113,7 +117,7 @@ export class EspLoader {
       }
     }
     return encoded;
-  };
+  }
 
   /**
    * @name macAddr
@@ -161,7 +165,7 @@ export class EspLoader {
       throw("Unknown chip family")
     }
     return macAddr;
-  };
+  }
 
   /**
    * @name _readEfuses
@@ -181,7 +185,7 @@ export class EspLoader {
     for (let i = 0; i < 4; i++) {
       this._efuses[i] = await this.readRegister(baseAddr + 4 * i);
     }
-  };
+  }
 
   /**
    * @name readRegister
@@ -191,7 +195,7 @@ export class EspLoader {
     let packet = this.pack("I", reg);
     let register = (await this.checkCommand(ESP_READ_REG, packet))[0];
     return this.unpack("I", register)[0];
-  };
+  }
 
   /**
    * @name chipType
@@ -211,7 +215,7 @@ export class EspLoader {
       }
     }
     return this._chipfamily;
-  };
+  }
 
   /**
    * @name chipType
@@ -235,7 +239,7 @@ export class EspLoader {
       return "ESP8266EX";
     }
     return null;
-  };
+  }
 
   /**
    * @name checkCommand
@@ -275,7 +279,7 @@ export class EspLoader {
       }
     }
     return [value, data];
-  };
+  }
 
   /**
    * @name timeoutPerMb
@@ -287,7 +291,7 @@ export class EspLoader {
         return DEFAULT_TIMEOUT;
       }
       return result;
-  };
+  }
 
   /**
    * @name sendCommand
@@ -303,7 +307,7 @@ export class EspLoader {
     packet = packet.concat(this.slipEncode(buffer));
     packet.push(0xC0);
     await this.writeToStream(packet);
-  };
+  }
 
   /**
    * @name getResponse
@@ -363,7 +367,7 @@ export class EspLoader {
     let value = reply.slice(5, 9);
     let data = reply.slice(9, -1);
     return [value, data];
-  };
+  }
 
 /**
    * @name read
@@ -412,7 +416,7 @@ export class EspLoader {
     }
     let data = reply.slice(1, -1);
     return data;
-  };
+  }
 
 
   /**
@@ -424,7 +428,7 @@ export class EspLoader {
       state ^= b;
     }
     return state;
-  };
+  }
   
   getChromeVersion() {
     let raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
@@ -445,7 +449,7 @@ export class EspLoader {
     await this.sleep(100);
     await this.checkCommand(ESP_CHANGE_BAUDRATE, buffer);
     this.logFunc("Changed baud rate to " + baud);
-  };
+  }
 
   pack(...args) {
     let format = args[0];
@@ -487,7 +491,7 @@ export class EspLoader {
     }
 
     return bytes;
-  };
+  }
 
   unpack(format, bytes) {
     let pointer = 0;
@@ -514,7 +518,7 @@ export class EspLoader {
       }
     }
     return data;
-  };
+  }
 
   /**
    * @name sync
@@ -532,7 +536,7 @@ export class EspLoader {
     }
 
     throw("Couldn't sync to ESP. Try resetting.");
-  };
+  }
 
   /**
    * @name _sync
@@ -560,7 +564,7 @@ export class EspLoader {
         this.logFunc("ESP not responding, trying again...");
     }
     return false;
-  };
+  }
 
   /**
    * @name getFlashWriteSize
@@ -571,7 +575,7 @@ export class EspLoader {
       return ESP32S2_FLASH_WRITE_SIZE;
     }
     return FLASH_WRITE_SIZE;
-  };
+  }
 
   /**
    * @name flashData
@@ -611,7 +615,7 @@ export class EspLoader {
       position += flashWriteSize;
     }
     this.logFunc("Took " + (Date.now() - stamp) + "ms to write " + filesize + " bytes");
-  };
+  }
 
   /**
    * @name flashBlock
@@ -624,7 +628,7 @@ export class EspLoader {
       this.checksum(data),
       timeout,
     );
-  };
+  }
   
   toHex(value, size=2) {
     return "0x" + value.toString(16).toUpperCase().padStart(size, "0");
@@ -680,12 +684,12 @@ export class EspLoader {
       this.logFunc("Took " + (Date.now() - stamp) + "ms to erase " + numBlocks + " bytes");
     }
     return numBlocks;
-  };
+  }
 
   async flashFinish() {
     let buffer = this.pack('<I', 1);
     await this.checkCommand(ESP_FLASH_END, buffer);
-  };
+  }
 
   /**
    * @name getEraseSize
@@ -708,7 +712,7 @@ export class EspLoader {
     }
 
     return (numSectors - headSectors) * sectorSize;
-  };
+  }
 
     /**
    * @name memBegin (592)
@@ -850,5 +854,5 @@ class EspStubLoader extends EspLoader {
    */
   async eraseFlash() {
     await this.checkCommand(ESP_ERASE_FLASH, [], 0, CHIP_ERASE_TIMEOUT);
-  };
+  }
 }

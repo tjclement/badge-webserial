@@ -4,6 +4,7 @@ import Apps from '@/components/Apps';
 import Programming from '@/components/Programming';
 import Update from '@/components/Update';
 import Settings from '@/components/Settings';
+import Recover from '@/components/Recover';
 import BadGateway from '@/components/BadGateway';
 
 
@@ -41,7 +42,7 @@ export default new Router({
       path: '/recover',
       name: 'Recover',
       props: { page: 5 },
-      component: Settings
+      component: Recover
     },
     {
       path: '/404',
