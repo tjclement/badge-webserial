@@ -211,7 +211,7 @@
                 let metadata_url = 'https://badge.team/eggs/get/' + app_slug + '/json';
                 let response = await fetch(metadata_url);
                 let metadata = await response.json();
-                let release_keys = Object.keys(metadata.releases).sort();
+                let release_keys = Object.keys(metadata.releases).sort((a, b) => parseInt(a) - parseInt(b));
                 let latest_release_key = release_keys[release_keys.length-1];
                 metadata['latest_release_url'] = metadata.releases[latest_release_key][0]['url'];
                 return metadata;
