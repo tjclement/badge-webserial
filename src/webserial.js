@@ -179,11 +179,19 @@ export function savetextfile(filename, contents) {
     return transceive(`\x05f=open('${filename}', 'wt')\r\nf.write('${escaped}')\r\nf.close()\x04`, false);
 }
 
-export function savefile(filename, contents) {
+export async function savefile(filename, contents) {
     filename = strip_flash(filename);
     let data = new Uint8Array(contents);
-    let base64 = encode(data);
-    return transceive(`\x05import binascii\r\nf=open('${filename}', 'wb')\r\nf.write(binascii.a2b_base64('${base64}'))\r\nf.close()\x04`, false);
+    await transceive(`import binascii; f=open('${filename}', 'wb')\r\n`);
+
+    let chunk_size = 512;
+    for (let i = 0; i < data.length; i += chunk_size) {
+        let chunk_data = data.slice(i, i + chunk_size);
+        let base64 = encode(chunk_data);
+        await transceive(`f.write(binascii.a2b_base64('${base64}'))\r\n`, false);
+    }
+
+    return transceive(`f.close()\r\n`, false);
 }
 
 export function createfolder(folder) {

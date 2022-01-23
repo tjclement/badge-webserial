@@ -196,9 +196,9 @@ export default {
         for(let index = 0; index < e.dataTransfer.files.length; index++) {
           let item = e.dataTransfer.files[index];
           let reader = new FileReader();
-          reader.onload = function (event) {
+          reader.onload = async function (event) {
             console.log(reader.result);
-            savefile(path+"/"+item.name,reader.result);
+            await savefile(path+"/"+item.name,reader.result);
             if(index == e.dataTransfer.files.length) {
               component.updateNode(entry);
             }
