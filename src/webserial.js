@@ -152,7 +152,7 @@ export function runfile(file_path) {
     if(file_path.startsWith('/flash')) {
         file_path = file_path.slice('/flash'.length);
     }
-    return transceive(`__import__('${file_path}')`);
+    return transceive(`if 'running_app' in locals(): del running_app;running_app=__import__('${file_path}')`);
 }
 
 export function duplicatefile(source, destination) {
